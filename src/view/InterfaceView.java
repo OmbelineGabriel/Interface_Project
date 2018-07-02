@@ -1,19 +1,40 @@
 package view;
 
-import model.Interface;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.util.ArrayList;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.swing.*;
+import javax.swing.ButtonGroup;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSeparator;
+import javax.swing.JSlider;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.event.ActionEvent;
-import java.io.*;
+import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
+import model.Interface;
 
 
 @SuppressWarnings("serial")
@@ -24,6 +45,8 @@ public class InterfaceView extends JFrame implements ActionListener{
 	JButton resetVib;
 	JButton testVib;
 	
+	ArrayList<ImageIcon> listOfImages = new ArrayList<ImageIcon>();
+		
 	ImageIcon screen1 = new ImageIcon("images/secure-banking.png"); 
 	ImageIcon screen2 = new ImageIcon("images/secure-socialmedia.png");
 	ImageIcon screen3 = new ImageIcon("images/secure-random.png");
@@ -46,7 +69,6 @@ public class InterfaceView extends JFrame implements ActionListener{
 	private JLabel beat3Label = new JLabel("       Beat 3 /");
 	private JLabel beat4Label = new JLabel("       Beat 4 /");
 	
-	static int j=1;
 	static final int tempMin = 22;
 	static final int tempMax = 38;
 	static final int tempInit = 30; 
@@ -87,7 +109,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 	
 	private JSlider temperature = new JSlider(JSlider.HORIZONTAL,tempMin, tempMax, tempInit);
 	String participantId = JOptionPane.showInputDialog(this, "Participant ID:");
-
+	
 	private Interface interf;
 	
 	/**
@@ -104,6 +126,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 		setVisible(true);
 		setLocationRelativeTo(null);
 	}
+
 
 	/**
 	 * Sets up the north panel
@@ -135,6 +158,19 @@ public class InterfaceView extends JFrame implements ActionListener{
 		img.setLayout(new FlowLayout());
 		img.add(imageLabel);
 		
+		//listOfImages.add(screen1);
+		listOfImages.add(screen2);
+		listOfImages.add(screen3);
+		listOfImages.add(screen4);
+		listOfImages.add(screen5);
+		listOfImages.add(screen6);
+		listOfImages.add(screen7);
+		listOfImages.add(screen8);
+		listOfImages.add(screen9);
+		listOfImages.add(screen10);
+		listOfImages.add(screen11);
+		listOfImages.add(screen12);
+
 		JPanel WestPanel = new JPanel();
 		WestPanel.setLayout(new FlowLayout());
 		WestPanel.add(img);
@@ -168,6 +204,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 		shortVib1.setText("Short Vibration");
 		lengthGroup1.add(longVib1);
 		longVib1.setText("Long Vibration");
+		
 		
 		vib.add(beat1Label);
 		vib.add(new JSeparator(SwingConstants.HORIZONTAL));
@@ -302,6 +339,34 @@ public class InterfaceView extends JFrame implements ActionListener{
 	      }
 	};
 	
+
+	/**
+	 * Adds to the results file the selected temperature for the current warning
+	 * @param filename
+	 */
+	private void addToFile(String filename)
+	{
+		BufferedWriter bw = null;
+		FileWriter fw = null;
+		try {
+			File file = new File(filename);
+			fw = new FileWriter(file.getAbsoluteFile(), true);
+			bw = new BufferedWriter(fw);
+			bw.write("\n" + currentScreen() + "," +temperature.getValue());
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (bw != null)
+					bw.close();
+				if (fw != null)
+					fw.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+	}
+	
 	/**
 	 * Adds to the results file the selected vibration/pause for each beat
 	 * @param beat
@@ -331,41 +396,14 @@ public class InterfaceView extends JFrame implements ActionListener{
 		}
 	}
 	
-	/**
-	 * Adds to the results file the selected temperature
-	 * @param filename
-	 */
-	private void addToFile(String filename)
-	{
-		BufferedWriter bw = null;
-		FileWriter fw = null;
-		try {
-			File file = new File(filename);
-			fw = new FileWriter(file.getAbsoluteFile(), true);
-			bw = new BufferedWriter(fw);
-			bw.write("\n" + j + "," +temperature.getValue());
-			j++;
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (bw != null)
-					bw.close();
-				if (fw != null)
-					fw.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
-	}
 	
 	/**
 	 * Defines what happens when a button is clicked
 	 */
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == validateSettings) {
-			changeScreen();
 			addToFile("results-"+ participantId + ".txt");
+			changeScreen();
 		    whatIsSelected("results-"+ participantId + ".txt");
 		    resetButtons();
 			temperature.setValue(30);
@@ -376,137 +414,93 @@ public class InterfaceView extends JFrame implements ActionListener{
 		}
 		else if (e.getSource() == testVib)
 		{
-			if (intensityLow1.isSelected() && shortVib1.isSelected())
-			{
-				playFile("sounds/LowShort.wav", 350);
-			}
-			if (intensityLow1.isSelected() && longVib1.isSelected())
-			{
-				playFile("sounds/LowLong.wav", 750);
-			}
-			if (intensityHigh1.isSelected() && shortVib1.isSelected())
-			{
-				playFile("sounds/HighShort.wav", 350);
-			}
-			if (intensityHigh1.isSelected() && longVib1.isSelected())
-			{
-				playFile("sounds/HighLong.wav", 750);
-			}
-
-
-			if (intensityLow2.isSelected() && shortVib2.isSelected())
-			{
-				playFile("sounds/LowShort.wav", 350);
-			}
-			if (intensityLow2.isSelected() && longVib2.isSelected())
-			{
-				playFile("sounds/LowLong.wav", 750);
-			}
-
-			if (intensityHigh2.isSelected() && shortVib2.isSelected())
-			{
-				playFile("sounds/HighShort.wav", 350);
-			}
-			if (intensityHigh2.isSelected() && longVib2.isSelected())
-			{
-				playFile("sounds/HighLong.wav", 750);
-			}
-			if (pause2.isSelected())
-			{
-				try {
-					TimeUnit.MILLISECONDS.sleep(400);
-				} catch (InterruptedException error3) {
-					error3.printStackTrace();
-				}
-			}
-			
-			if (intensityLow3.isSelected() && shortVib3.isSelected())
-			{
-				playFile("sounds/LowShort.wav", 350);
-			}
-			if (intensityLow3.isSelected() && longVib3.isSelected())
-			{
-				playFile("sounds/LowLong.wav", 750);
-			}
-			if (intensityHigh3.isSelected() && shortVib3.isSelected())
-			{
-				playFile("sounds/HighShort.wav", 350);
-			}
-			if (intensityHigh3.isSelected() && longVib3.isSelected())
-			{
-				playFile("sounds/HighLong.wav", 750);
-			}
-			if (pause3.isSelected())
-			{
-				try {
-					TimeUnit.MILLISECONDS.sleep(400);
-				} catch (InterruptedException error3) {
-					error3.printStackTrace();
-				}
-			}
-		
-			if (intensityLow4.isSelected() && shortVib4.isSelected())
-			{
-				playFile("sounds/LowShort.wav", 350);
-			}
-			if (intensityLow4.isSelected() && longVib4.isSelected())
-			{
-				playFile("sounds/LowLong.wav", 750);
-			}
-			if (intensityHigh4.isSelected() && shortVib4.isSelected())
-			{
-				playFile("sounds/HighShort.wav", 350);
-			}
-			if (intensityHigh4.isSelected() && longVib4.isSelected())
-			{
-				playFile("sounds/HighLong.wav", 750);
-			}
+			whatIsSelectedTestVib();
 		}
+			
 	}
 
 	/**
-	 * Changes the image shown to the next one when called
+	 * Returns a random index, to make sure images are shown in random order
+	 * @return index
 	 */
-	private void changeScreen()
+	private int randomIndex()
 	{
+		Random rand = new Random();
+		int index = 0;
+		if (listOfImages.size() != 0)
+		{
+			index = rand.nextInt(listOfImages.size())+1;
+			return index;
+		}
+		else
+			return index;
+	}
+	
+	/**
+	 * Returns the current screen/warning
+	 * @return warningNumber
+	 */
+	private int currentScreen()
+	{
+		int warningNumber = 0;
 		if (imageLabel.getIcon() == screen1){
-			imageLabel.setIcon(screen2);
+			warningNumber = 1;
 		}
 		else if(imageLabel.getIcon() == screen2){
-			imageLabel.setIcon(screen3);
+			warningNumber = 2;
 		}
 		
 		else if(imageLabel.getIcon() == screen3){
-			imageLabel.setIcon(screen4);
+			warningNumber = 3;
 		}
 		else if(imageLabel.getIcon() == screen4){
-			imageLabel.setIcon(screen5);
+			warningNumber = 4;
 		}
 		else if(imageLabel.getIcon() == screen5){
-			imageLabel.setIcon(screen6);
+			warningNumber = 5;
 		}
 		else if(imageLabel.getIcon() == screen6){
-			imageLabel.setIcon(screen7);
+			warningNumber = 6;
 		}
 		else if(imageLabel.getIcon() == screen7){
-			imageLabel.setIcon(screen8);
+			warningNumber = 7;
 		}
 		else if(imageLabel.getIcon() == screen8){
-			imageLabel.setIcon(screen9);
+			warningNumber = 8;
 		}
 		else if(imageLabel.getIcon() == screen9){
-			imageLabel.setIcon(screen10);
+			warningNumber = 9;
 		}
 		else if(imageLabel.getIcon() == screen10){
-			imageLabel.setIcon(screen11);
+			warningNumber = 10;
 		}
 		else if(imageLabel.getIcon() == screen11){
-			imageLabel.setIcon(screen12);
+			warningNumber = 11;
 		}
-		else 
+		else if(imageLabel.getIcon() == screen12){
+			warningNumber = 12;
+		}
+		return warningNumber;
+	}
+	
+	/**
+	 * Changes the screen to the next one, using the random function
+	 * to pick an image in the image list
+	 * then deletes that image from the list so it's not picked again
+	 */
+	private void changeScreen()
+	{
+		int randindex = randomIndex();
+		if (randindex !=0)
 		{
+			imageLabel.setIcon(listOfImages.get(randindex - 1));
+			listOfImages.remove(randindex - 1);
+		}
+		else
+		{
+			
 			JOptionPane.showMessageDialog(null,
-			    "Thank you!!");
+				    "Thank you!!");
 		}
 	}
 	
@@ -594,6 +588,99 @@ public class InterfaceView extends JFrame implements ActionListener{
 	}
 	
 	/**
+	 * Plays the audio file depending on what buttons are selected
+	 */
+	private void whatIsSelectedTestVib()
+	{
+		if (intensityLow1.isSelected() && shortVib1.isSelected())
+		{
+			playFile("sounds/LowShort.wav", 350);
+		}
+		if (intensityLow1.isSelected() && longVib1.isSelected())
+		{
+			playFile("sounds/LowLong.wav", 750);
+		}
+		if (intensityHigh1.isSelected() && shortVib1.isSelected())
+		{
+			playFile("sounds/HighShort.wav", 350);
+		}
+		if (intensityHigh1.isSelected() && longVib1.isSelected())
+		{
+			playFile("sounds/HighLong.wav", 750);
+		}
+
+
+		if (intensityLow2.isSelected() && shortVib2.isSelected())
+		{
+			playFile("sounds/LowShort.wav", 350);
+		}
+		if (intensityLow2.isSelected() && longVib2.isSelected())
+		{
+			playFile("sounds/LowLong.wav", 750);
+		}
+
+		if (intensityHigh2.isSelected() && shortVib2.isSelected())
+		{
+			playFile("sounds/HighShort.wav", 350);
+		}
+		if (intensityHigh2.isSelected() && longVib2.isSelected())
+		{
+			playFile("sounds/HighLong.wav", 750);
+		}
+		if (pause2.isSelected())
+		{
+			try {
+				TimeUnit.MILLISECONDS.sleep(400);
+			} catch (InterruptedException error3) {
+				error3.printStackTrace();
+			}
+		}
+		
+		if (intensityLow3.isSelected() && shortVib3.isSelected())
+		{
+			playFile("sounds/LowShort.wav", 350);
+		}
+		if (intensityLow3.isSelected() && longVib3.isSelected())
+		{
+			playFile("sounds/LowLong.wav", 750);
+		}
+		if (intensityHigh3.isSelected() && shortVib3.isSelected())
+		{
+			playFile("sounds/HighShort.wav", 350);
+		}
+		if (intensityHigh3.isSelected() && longVib3.isSelected())
+		{
+			playFile("sounds/HighLong.wav", 750);
+		}
+		if (pause3.isSelected())
+		{
+			try {
+				TimeUnit.MILLISECONDS.sleep(400);
+			} catch (InterruptedException error3) {
+				error3.printStackTrace();
+			}
+		}
+	
+		if (intensityLow4.isSelected() && shortVib4.isSelected())
+		{
+			playFile("sounds/LowShort.wav", 350);
+		}
+		if (intensityLow4.isSelected() && longVib4.isSelected())
+		{
+			playFile("sounds/LowLong.wav", 750);
+		}
+		if (intensityHigh4.isSelected() && shortVib4.isSelected())
+		{
+			playFile("sounds/HighShort.wav", 350);
+		}
+		if (intensityHigh4.isSelected() && longVib4.isSelected())
+		{
+			playFile("sounds/HighLong.wav", 750);
+		}
+	
+	}
+	
+	/**
 	 * Resets the buttons selected by the user
 	 */
 	private void resetButtons()
@@ -622,4 +709,5 @@ public class InterfaceView extends JFrame implements ActionListener{
 	        }    
 	    }
 	}
+
 }

@@ -28,6 +28,4 @@ public class Interface {
 		this.temperature = temperature;
 	}
 	
-	
-
 }
