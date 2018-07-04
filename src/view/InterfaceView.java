@@ -39,10 +39,10 @@ import model.Interface;
 
 @SuppressWarnings("serial")
 public class InterfaceView extends JFrame implements ActionListener{
-	private JLabel labelTemp = new JLabel("Temperature Settings                                            ");
+	private JLabel labelTemp = new JLabel("  Temperature Settings                                        ");
 	private JLabel labelVibration = new JLabel(" Vibration Settings");
 	private JLabel labelSec = new JLabel(" Rate the security level of this page: ");
-	private JLabel labelPerso = new JLabel("Would you enter personal information on this page?");
+	private JLabel labelPerso = new JLabel(" Would you enter personal information on this page?");
 
 
 	JButton validateSettings;
@@ -329,10 +329,10 @@ public class InterfaceView extends JFrame implements ActionListener{
 	 */
 	private void setupSouthPanel(Interface interf) {
 		JPanel sec = new JPanel();
-		sec.setLayout(new FlowLayout());
+		sec.setLayout(new FlowLayout(FlowLayout.LEFT));
 		
 		JPanel perso = new JPanel();
-		perso.setLayout(new FlowLayout());
+		perso.setLayout(new FlowLayout(FlowLayout.LEFT));
 		
 		sec.add(labelSec);
 		sec.add(securityLevel1);
@@ -428,8 +428,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 	}
 	
 	/**
-	 * Adds to the results file the selected vibration/pause for each beat
-	 * @param beat
+	 * Adds to the results file the selected buttons (vibration and other) for each beat
 	 * @param selec
 	 * @param filename
 	 */
