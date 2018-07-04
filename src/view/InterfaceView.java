@@ -41,6 +41,10 @@ import model.Interface;
 public class InterfaceView extends JFrame implements ActionListener{
 	private JLabel labelTemp = new JLabel("Temperature Settings                                            ");
 	private JLabel labelVibration = new JLabel(" Vibration Settings");
+	private JLabel labelSec = new JLabel(" Rate the security level of this page: ");
+	private JLabel labelPerso = new JLabel("Would you enter personal information on this page?");
+
+
 	JButton validateSettings;
 	JButton resetVib;
 	JButton testVib;
@@ -72,6 +76,10 @@ public class InterfaceView extends JFrame implements ActionListener{
 	static final int tempMin = 22;
 	static final int tempMax = 38;
 	static final int tempInit = 30; 
+	
+	static final int secMin = 1;
+	static final int secMax = 5;
+	static final int secInit = 3; 
 	
 	JRadioButton intensityLow1 = new JRadioButton();
 	JRadioButton intensityHigh1 = new JRadioButton();
@@ -107,7 +115,20 @@ public class InterfaceView extends JFrame implements ActionListener{
 	JRadioButton longVib4 = new JRadioButton();
 	ButtonGroup lengthGroup4 = new ButtonGroup();
 	
+	JRadioButton securityLevel1 = new JRadioButton();
+	JRadioButton securityLevel2 = new JRadioButton();
+	JRadioButton securityLevel3 = new JRadioButton();
+	JRadioButton securityLevel4 = new JRadioButton();
+	JRadioButton securityLevel5 = new JRadioButton();
+	ButtonGroup securityGroup = new ButtonGroup();
+	
+	JRadioButton persoYes = new JRadioButton();
+	JRadioButton persoNo = new JRadioButton();
+	ButtonGroup persoYN = new ButtonGroup();
+
+	
 	private JSlider temperature = new JSlider(JSlider.HORIZONTAL,tempMin, tempMax, tempInit);
+
 	String participantId = JOptionPane.showInputDialog(this, "Participant ID:");
 	
 	private Interface interf;
@@ -122,7 +143,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 		setupEastPanel(interf);
 		setupSouthPanel(interf);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		setSize(1300, 650);
+		setSize(1300, 750);
 		setVisible(true);
 		setLocationRelativeTo(null);
 	}
@@ -135,6 +156,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 	private void setupNorthPanel(Interface interf) {
 		JPanel temp = new JPanel();
 		temp.setLayout(new FlowLayout());
+	
 		temp.add(labelTemp);
 		temp.add(temperature);
 		temperature.setMajorTickSpacing(4);
@@ -142,7 +164,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 		temperature.setPaintTicks(true);
 		temperature.setPaintLabels(true);
 		temperature.addChangeListener(new SliderListener());
-
+		
 		JPanel northPanel = new JPanel();
 		northPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		northPanel.add(temp);
@@ -194,7 +216,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 		JPanel vib4 = new JPanel();
 		vib4.setLayout(new GridLayout(13,1));
 		vib.add(labelVibration);
-		
+				
 		intensityGroup1.add(intensityLow1);
 		intensityLow1.setText("Low");
 		intensityGroup1.add(intensityHigh1);
@@ -243,7 +265,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 		vib2.add(resetVib);
 		resetVib.addActionListener(this);
 		
-		intensityGroup3.add(intensityLow3);
+		intensityGroup3.add(intensityLow3);		
 		intensityLow3.setText("Low");
 		intensityGroup3.add(intensityHigh3);
 		intensityHigh3.setText("High");
@@ -306,6 +328,41 @@ public class InterfaceView extends JFrame implements ActionListener{
 	 * @param interf
 	 */
 	private void setupSouthPanel(Interface interf) {
+		JPanel sec = new JPanel();
+		sec.setLayout(new FlowLayout());
+		
+		JPanel perso = new JPanel();
+		perso.setLayout(new FlowLayout());
+		
+		sec.add(labelSec);
+		sec.add(securityLevel1);
+		sec.add(securityLevel2);
+		sec.add(securityLevel3);
+		sec.add(securityLevel4);
+		sec.add(securityLevel5);
+
+		perso.add(labelPerso);
+		perso.add(persoYes);
+		perso.add(persoNo);
+		
+		persoYes.setText("Yes");
+		persoYN.add(persoYes);
+		persoNo.setText("No");
+		persoYN.add(persoNo);
+
+
+		securityGroup.add(securityLevel1);
+		securityLevel1.setText("Very unsecure");
+		securityGroup.add(securityLevel2);
+		securityLevel2.setText("Unsecure");
+		securityGroup.add(securityLevel3);
+		securityLevel3.setText("Average");
+		securityGroup.add(securityLevel4);
+		securityLevel4.setText("Secure");
+		securityGroup.add(securityLevel5);
+		securityLevel5.setText("Very secure");
+		
+
 		JPanel validate = new JPanel();
 		validate.setLayout(new FlowLayout());
 		validateSettings = new JButton("Validate Settings");
@@ -314,8 +371,11 @@ public class InterfaceView extends JFrame implements ActionListener{
 		validateSettings.addActionListener(this);
 		
 		JPanel southPanel = new JPanel();
-		southPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		southPanel.setLayout(new GridLayout(3,1));
+		southPanel.add(sec);
+		southPanel.add(perso);
 		southPanel.add(validate);
+	
 		this.add(southPanel, BorderLayout.SOUTH);
 	}
 
@@ -373,7 +433,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 	 * @param selec
 	 * @param filename
 	 */
-	private void addToResults(int beat, String selec, String filename)
+	private void addToResults(String selec, String filename)
 	{
 		BufferedWriter bw = null;
 		FileWriter fw = null;
@@ -406,6 +466,8 @@ public class InterfaceView extends JFrame implements ActionListener{
 			changeScreen();
 		    whatIsSelected("results-"+ participantId + ".txt");
 		    resetButtons();
+		    securityGroup.clearSelection();
+		    persoYN.clearSelection();
 			temperature.setValue(30);
 		}
 		else if (e.getSource() == resetVib)
@@ -415,8 +477,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 		else if (e.getSource() == testVib)
 		{
 			whatIsSelectedTestVib();
-		}
-			
+		}			
 	}
 
 	/**
@@ -510,81 +571,111 @@ public class InterfaceView extends JFrame implements ActionListener{
 	 */
 	private void whatIsSelected(String filename)
 	{
+		
+		if (securityLevel1.isSelected())
+		{
+			addToResults("1", filename);
+		}
+		if (securityLevel2.isSelected())
+		{
+			addToResults("2", filename);
+		}
+		if (securityLevel3.isSelected())
+		{
+			addToResults("3", filename);
+		}
+		if (securityLevel4.isSelected())
+		{
+			addToResults("4", filename);
+		}
+		if (securityLevel5.isSelected())
+		{
+			addToResults("5", filename);
+		}
+		if (persoNo.isSelected())
+		{
+			addToResults("0", filename);
+		}
+		if (persoYes.isSelected())
+		{
+			addToResults("1", filename);
+		}
+		
 	//0 is pause, 1 is low short, 2 is low long, 3 is high short, 4 is low long
 		if (intensityLow1.isSelected() && shortVib1.isSelected())
 		{
-			addToResults(1,"1", filename);
+			addToResults("1", filename);
 		}
 		if (intensityLow1.isSelected() && longVib1.isSelected())
 		{
-			addToResults(1,"2", filename);
+			addToResults("2", filename);
 		}
 		if (intensityHigh1.isSelected() && shortVib1.isSelected())
 		{
-			addToResults(1,"3", filename);
+			addToResults("3", filename);
 		}
 		if (intensityHigh1.isSelected() && longVib1.isSelected())
 		{
-			addToResults(1,"4", filename);
+			addToResults("4", filename);
 		}
 		
 		if (intensityLow2.isSelected() && shortVib2.isSelected())
 		{
-			addToResults(2,"1", filename);
+			addToResults("1", filename);
 		}
 		if (intensityLow2.isSelected() && longVib2.isSelected())
 		{
-			addToResults(2,"2", filename);
+			addToResults("2", filename);
 		}
 		if (intensityHigh2.isSelected() && shortVib2.isSelected())
 		{
-			addToResults(2,"3", filename);
+			addToResults("3", filename);
 		}
 		if (intensityHigh2.isSelected() && longVib2.isSelected())
 		{
-			addToResults(2,"4", filename);
+			addToResults("4", filename);
 		}
 		if (pause2.isSelected())
 		{
-			addToResults(2,"0", filename);
+			addToResults("0", filename);
 		}
 		if (intensityLow3.isSelected() && shortVib3.isSelected())
 		{
-			addToResults(3,"1", filename);
+			addToResults("1", filename);
 		}
 		if (intensityLow3.isSelected() && longVib3.isSelected())
 		{
-			addToResults(3,"2", filename);
+			addToResults("2", filename);
 		}
 		if (intensityHigh3.isSelected() && shortVib3.isSelected())
 		{
-			addToResults(3,"3", filename);
+			addToResults("3", filename);
 		}
 		if (intensityHigh3.isSelected() && longVib3.isSelected())
 		{
-			addToResults(3,"4", filename);
+			addToResults("4", filename);
 		}
 		if (pause3.isSelected())
 		{
-			addToResults(3,"0", filename);
+			addToResults("0", filename);
 		}
 		if (intensityLow4.isSelected() && shortVib4.isSelected())
 		{
-			addToResults(4,"1", filename);
+			addToResults("1", filename);
 		}
 		if (intensityLow4.isSelected() && longVib4.isSelected())
 		{
-			addToResults(4,"4", filename);
+			addToResults("4", filename);
 		}
 		if (intensityHigh4.isSelected() && shortVib4.isSelected())
 		{
-			addToResults(4,"3", filename);
+			addToResults("3", filename);
 		}
 		if (intensityHigh4.isSelected() && longVib4.isSelected())
 		{
-			addToResults(4,"4", filename);
+			addToResults("4", filename);
 		}
-		
+	
 	}
 	
 	/**
