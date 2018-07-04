@@ -1,0 +1,4 @@
+order:
+warning #, temperature, security level, perso inf, vibration where:
+      0 is pause, 1 is low short, 2 is low long, 3 is high short, 4 is low long
+
