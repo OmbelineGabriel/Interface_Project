@@ -130,7 +130,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 	private JSlider temperature = new JSlider(JSlider.HORIZONTAL,tempMin, tempMax, tempInit);
 
 	String participantId = JOptionPane.showInputDialog(this, "Participant ID:");
-	
+		
 	private Interface interf;
 	
 	/**
@@ -180,7 +180,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 		img.setLayout(new FlowLayout());
 		img.add(imageLabel);
 		
-		//listOfImages.add(screen1);
+		listOfImages.add(screen1);
 		listOfImages.add(screen2);
 		listOfImages.add(screen3);
 		listOfImages.add(screen4);
@@ -192,6 +192,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 		listOfImages.add(screen10);
 		listOfImages.add(screen11);
 		listOfImages.add(screen12);
+		changeScreen();
 
 		JPanel WestPanel = new JPanel();
 		WestPanel.setLayout(new FlowLayout());
