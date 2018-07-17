@@ -35,14 +35,23 @@ import javax.swing.event.ChangeListener;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import model.Interface;
+import peltier.PeltierControl;
 
 
 @SuppressWarnings("serial")
 public class InterfaceView extends JFrame implements ActionListener{
-	private JLabel labelTemp = new JLabel("  Temperature Settings                                        ");
+	private JLabel labelTemp = new JLabel("  Temperature Settings      ");
 	private JLabel labelVibration = new JLabel(" Vibration Settings");
 	private JLabel labelSec = new JLabel(" Rate the security level of this page: ");
 	private JLabel labelPerso = new JLabel(" Would you enter personal information on this page?");
+
+	
+	/////////////////////////////////////TEMP STUFF
+	public static JLabel peltierStatus = new JLabel("              Connecting...  ");
+	long time_windowOpened, time_firstTempChange = 0, time_lastTempChange = 0;
+	Thread tempTimerThread;
+	final int cooldownTime = 45;
+	JButton reconnect = new JButton("Reconnect");
 
 
 	JButton validateSettings;
@@ -50,6 +59,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 	JButton testVib;
 	
 	ArrayList<ImageIcon> listOfImages = new ArrayList<ImageIcon>();
+	private int questNum=1;
 		
 	ImageIcon screen1 = new ImageIcon("images/secure-banking.png"); 
 	ImageIcon screen2 = new ImageIcon("images/secure-socialmedia.png");
@@ -132,20 +142,30 @@ public class InterfaceView extends JFrame implements ActionListener{
 	String participantId = JOptionPane.showInputDialog(this, "Participant ID:");
 		
 	private Interface interf;
+
 	
 	/**
 	 * Defines the basic of the interface
 	 * @param interf
 	 */
 	public InterfaceView(Interface interf) {
-		setupNorthPanel(interf);
+		//setupNorthPanel(interf);
 		setupWestPanel(interf);
 		setupEastPanel(interf);
 		setupSouthPanel(interf);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 		setSize(1300, 750);
 		setVisible(true);
+		setTitle("Question "+questNum+"/12");
 		setLocationRelativeTo(null);
+		addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		    	if (time_firstTempChange != 0){
+		    		PeltierControl.cooldown((long) 30.0);
+		    	}
+		    }
+		    });
 	}
 
 
@@ -153,10 +173,19 @@ public class InterfaceView extends JFrame implements ActionListener{
 	 * Sets up the north panel
 	 * @param interf
 	 */
+	/*
 	private void setupNorthPanel(Interface interf) {
 		JPanel temp = new JPanel();
 		temp.setLayout(new FlowLayout());
 	
+		reconnect.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				PeltierControl.init();
+			}
+		});
+		
 		temp.add(labelTemp);
 		temp.add(temperature);
 		temperature.setMajorTickSpacing(4);
@@ -164,13 +193,15 @@ public class InterfaceView extends JFrame implements ActionListener{
 		temperature.setPaintTicks(true);
 		temperature.setPaintLabels(true);
 		temperature.addChangeListener(new SliderListener());
+		temp.add(peltierStatus);
+		temp.add(reconnect);
 		
 		JPanel northPanel = new JPanel();
 		northPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
 		northPanel.add(temp);
 		this.add(northPanel, BorderLayout.NORTH);
 	}
-	
+	 */
 	/**
 	 * Sets up the west panel
 	 * @param interf
@@ -335,6 +366,9 @@ public class InterfaceView extends JFrame implements ActionListener{
 		JPanel perso = new JPanel();
 		perso.setLayout(new FlowLayout(FlowLayout.LEFT));
 		
+		JPanel temp = new JPanel();
+		temp.setLayout(new FlowLayout(FlowLayout.LEFT));
+		
 		sec.add(labelSec);
 		sec.add(securityLevel1);
 		sec.add(securityLevel2);
@@ -363,6 +397,24 @@ public class InterfaceView extends JFrame implements ActionListener{
 		securityGroup.add(securityLevel5);
 		securityLevel5.setText("Very secure");
 		
+		
+		reconnect.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				PeltierControl.init();
+			}
+		});
+		
+		temp.add(labelTemp);
+		temp.add(temperature);
+		temperature.setMajorTickSpacing(4);
+		temperature.setMinorTickSpacing(1);
+		temperature.setPaintTicks(true);
+		temperature.setPaintLabels(true);
+		temperature.addChangeListener(new SliderListener());
+		temp.add(peltierStatus);
+		temp.add(reconnect);
 
 		JPanel validate = new JPanel();
 		validate.setLayout(new FlowLayout());
@@ -372,13 +424,15 @@ public class InterfaceView extends JFrame implements ActionListener{
 		validateSettings.addActionListener(this);
 		
 		JPanel southPanel = new JPanel();
-		southPanel.setLayout(new GridLayout(3,1));
+		southPanel.setLayout(new GridLayout(5,1));
+		southPanel.add(temp);
 		southPanel.add(sec);
 		southPanel.add(perso);
 		southPanel.add(validate);
 	
 		this.add(southPanel, BorderLayout.SOUTH);
 	}
+
 
 	/**
 	 * Plays the audiofile and adds forces a pause so that the files are playing one after the other 
@@ -469,6 +523,12 @@ public class InterfaceView extends JFrame implements ActionListener{
 		    securityGroup.clearSelection();
 		    persoYN.clearSelection();
 			temperature.setValue(30);
+			questNum++;
+			setTitle("Question "+questNum+"/12");
+			if (questNum == 13)
+			{
+				System.exit(0);
+			}
 		}
 		else if (e.getSource() == resetVib)
 		{
@@ -786,6 +846,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 		intensityGroup4.clearSelection();
 	}
 	
+
 	/**
 	 * Sets up a change listener on the temperature slider
 	 * @author Gabriel

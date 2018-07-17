@@ -27,5 +27,6 @@ public class Interface {
 	public void setTemperature(int temperature) {
 		this.temperature = temperature;
 	}
+
 	
 }
