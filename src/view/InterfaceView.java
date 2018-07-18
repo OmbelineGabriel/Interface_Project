@@ -7,6 +7,8 @@ import java.awt.GridLayout;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -47,7 +49,9 @@ public class InterfaceView extends JFrame implements ActionListener{
 
 	
 	/////////////////////////////////////TEMP STUFF
-	public static JLabel peltierStatus = new JLabel("              Connecting...  ");
+	public static JLabel peltierStatus = new JLabel();
+	public static JLabel tempStatus = new JLabel(" ");
+
 	long time_windowOpened, time_firstTempChange = 0, time_lastTempChange = 0;
 	Thread tempTimerThread;
 	final int cooldownTime = 45;
@@ -82,10 +86,6 @@ public class InterfaceView extends JFrame implements ActionListener{
 	private JLabel beat2Label = new JLabel("       Beat 2 /");
 	private JLabel beat3Label = new JLabel("       Beat 3 /");
 	private JLabel beat4Label = new JLabel("       Beat 4 /");
-	
-	static final int tempMin = 22;
-	static final int tempMax = 38;
-	static final int tempInit = 30; 
 	
 	static final int secMin = 1;
 	static final int secMax = 5;
@@ -137,7 +137,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 	ButtonGroup persoYN = new ButtonGroup();
 
 	
-	private JSlider temperature = new JSlider(JSlider.HORIZONTAL,tempMin, tempMax, tempInit);
+	private JSlider temperature = new JSlider();
 
 	String participantId = JOptionPane.showInputDialog(this, "Participant ID:");
 		
@@ -158,6 +158,10 @@ public class InterfaceView extends JFrame implements ActionListener{
 		setVisible(true);
 		setTitle("Question "+questNum+"/12");
 		setLocationRelativeTo(null);
+		initListeners();
+
+		tempTimerThread = new Thread();
+		time_windowOpened = System.currentTimeMillis();
 		addWindowListener(new java.awt.event.WindowAdapter() {
 		    @Override
 		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
@@ -369,6 +373,9 @@ public class InterfaceView extends JFrame implements ActionListener{
 		JPanel temp = new JPanel();
 		temp.setLayout(new FlowLayout(FlowLayout.LEFT));
 		
+		JPanel temp2 = new JPanel();
+		temp2.setLayout(new FlowLayout(FlowLayout.LEFT));
+		
 		sec.add(labelSec);
 		sec.add(securityLevel1);
 		sec.add(securityLevel2);
@@ -408,13 +415,18 @@ public class InterfaceView extends JFrame implements ActionListener{
 		
 		temp.add(labelTemp);
 		temp.add(temperature);
-		temperature.setMajorTickSpacing(4);
+		
 		temperature.setMinorTickSpacing(1);
-		temperature.setPaintTicks(true);
-		temperature.setPaintLabels(true);
-		temperature.addChangeListener(new SliderListener());
+		temperature.setMajorTickSpacing(10);
+		temperature.setMinimum(220);
+		temperature.setMaximum(380);
+		temperature.setValue(300);
+
+	//	temperature.addChangeListener(new SliderListener());
+		peltierStatus = new JLabel(("              Connecting...  "));		
 		temp.add(peltierStatus);
 		temp.add(reconnect);
+		temp2.add(tempStatus);
 
 		JPanel validate = new JPanel();
 		validate.setLayout(new FlowLayout());
@@ -424,8 +436,9 @@ public class InterfaceView extends JFrame implements ActionListener{
 		validateSettings.addActionListener(this);
 		
 		JPanel southPanel = new JPanel();
-		southPanel.setLayout(new GridLayout(5,1));
+		southPanel.setLayout(new GridLayout(6,1));
 		southPanel.add(temp);
+		southPanel.add(temp2);
 		southPanel.add(sec);
 		southPanel.add(perso);
 		southPanel.add(validate);
@@ -433,6 +446,65 @@ public class InterfaceView extends JFrame implements ActionListener{
 		this.add(southPanel, BorderLayout.SOUTH);
 	}
 
+	
+	final Runnable tempControl = new Runnable()
+	{
+		public void run() {
+			//SET PELTIER TEMPERATURE
+			System.out.println("Setting the temperature to: "+Integer.toString(temperature.getValue()));
+			PeltierControl.setPeltierTemperature((temperature.getValue()));
+				
+			for (int i = 10; i > 0; i--){
+				System.out.println("changing the temperature");
+				tempStatus.setText(" Setting temperature...");
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				return;
+				}
+			}
+				
+			//RESET PELTIER TEMPERATURE
+			System.out.println("Finished setting the temperature to "+temperature.getValue());
+			tempStatus.setText("Temperature Set");
+			//PeltierControl.setPeltierTemperature(300);
+			//temp_slider.setValue(30);
+		}
+			
+	};
+	
+	
+	private void initListeners()
+	{
+		temperature.addMouseListener(new MouseListener(){
+			public void mouseClicked(MouseEvent arg0) {}
+			public void mouseEntered(MouseEvent arg0) {}
+			public void mouseExited(MouseEvent arg0) {}
+			public void mousePressed(MouseEvent arg0) {}
+			
+			public void mouseReleased(MouseEvent arg0) {
+				if (time_firstTempChange == 0){
+					time_firstTempChange = System.currentTimeMillis();
+					time_lastTempChange = System.currentTimeMillis();
+				}
+				if (tempTimerThread.isAlive()){
+					tempTimerThread.interrupt();
+				}
+				tempTimerThread = new Thread(tempControl);
+				tempTimerThread.start();
+			}	
+		});
+		
+		temperature.addChangeListener(new ChangeListener(){
+			public void stateChanged(ChangeEvent arg0) {
+				time_lastTempChange = System.currentTimeMillis();
+			}
+			
+		});
+	}
+
+		
 
 	/**
 	 * Plays the audiofile and adds forces a pause so that the files are playing one after the other 
@@ -522,7 +594,9 @@ public class InterfaceView extends JFrame implements ActionListener{
 		    resetButtons();
 		    securityGroup.clearSelection();
 		    persoYN.clearSelection();
-			temperature.setValue(30);
+			temperature.setValue(300);
+			PeltierControl.setPeltierTemperature(300);
+			System.out.println("Resetting temperature to 30°C");
 			questNum++;
 			setTitle("Question "+questNum+"/12");
 			if (questNum == 13)
@@ -845,13 +919,15 @@ public class InterfaceView extends JFrame implements ActionListener{
 		intensityGroup3.clearSelection();
 		intensityGroup4.clearSelection();
 	}
-	
 
+
+	
 	/**
 	 * Sets up a change listener on the temperature slider
 	 * @author Gabriel
 	 *
 	 */
+	/*
 	class SliderListener implements ChangeListener {
 	    public void stateChanged(ChangeEvent e) {
 	        JSlider source = (JSlider)e.getSource();
@@ -861,5 +937,5 @@ public class InterfaceView extends JFrame implements ActionListener{
 	        }    
 	    }
 	}
-
+	 */
 }
