@@ -1,4 +1,3 @@
-package peltier;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,14 +12,9 @@ import javax.bluetooth.LocalDevice;
 import javax.bluetooth.RemoteDevice;
 import javax.bluetooth.ServiceRecord;
 import javax.bluetooth.UUID;
-import javax.microedition.io.Connection;
 import javax.microedition.io.Connector;
 import javax.microedition.io.InputConnection;
 import javax.microedition.io.OutputConnection;
-import javax.microedition.io.StreamConnection;
-import javax.microedition.io.StreamConnectionNotifier;
-
-import view.InterfaceView;
 
 public class PeltierControl {
 
