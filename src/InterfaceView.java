@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -39,6 +40,8 @@ import javax.swing.event.ChangeListener;
 @SuppressWarnings("serial")
 public class InterfaceView extends JFrame implements ActionListener{
 	private JLabel labelTemp = new JLabel("  Temperature Settings      ");
+	private JLabel labelTemp2 = new JLabel(" This corresponds to");
+
 	private JLabel labelVibration = new JLabel(" Vibration Settings");
 	private JLabel labelSec = new JLabel(" Rate the security level of this page: ");
 	private JLabel labelPerso = new JLabel(" Would you enter personal information on this page?");
@@ -131,6 +134,13 @@ public class InterfaceView extends JFrame implements ActionListener{
 	JRadioButton persoNo = new JRadioButton();
 	ButtonGroup persoYN = new ButtonGroup();
 
+	JRadioButton veryCold = new JRadioButton();
+	JRadioButton cold = new JRadioButton();
+	JRadioButton neutral = new JRadioButton();
+	JRadioButton warm = new JRadioButton();
+	JRadioButton veryWarm = new JRadioButton();
+	ButtonGroup tempGroup = new ButtonGroup();
+
 	
 	private JSlider temperature = new JSlider();
 
@@ -201,17 +211,19 @@ public class InterfaceView extends JFrame implements ActionListener{
 	 * @param interf
 	 */
 	private void setupEastPanel() {
-		JPanel vib = new JPanel();
-		vib.setLayout(new GridLayout(13,1));
+
+		JPanel vib = new JPanel();		
+		vib.setLayout(new GridLayout(14,1));
 		
 		JPanel vib2 = new JPanel();
-		vib2.setLayout(new GridLayout(13,1));
+		vib2.setLayout(new GridLayout(14,1));
 		
 		JPanel vib3 = new JPanel();
-		vib3.setLayout(new GridLayout(13,1));
+		vib3.setLayout(new GridLayout(14,1));
 		
 		JPanel vib4 = new JPanel();
-		vib4.setLayout(new GridLayout(13,1));
+		vib4.setLayout(new GridLayout(14,1));
+		
 		vib.add(labelVibration);
 				
 		intensityGroup1.add(intensityLow1);
@@ -223,8 +235,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 		shortVib1.setText("Short Vibration");
 		lengthGroup1.add(longVib1);
 		longVib1.setText("Long Vibration");
-		
-		
+
 		vib.add(beat1Label);
 		vib.add(new JSeparator(SwingConstants.HORIZONTAL));
 		vib.add(intensityLow1);
@@ -337,6 +348,17 @@ public class InterfaceView extends JFrame implements ActionListener{
 		JPanel temp2 = new JPanel();
 		temp2.setLayout(new FlowLayout(FlowLayout.LEFT));
 		
+		
+		JPanel temp3 = new JPanel();
+		temp3.setLayout(new FlowLayout(FlowLayout.LEFT));
+		
+		temp3.add(labelTemp2);
+		temp3.add(veryCold);
+		temp3.add(cold);
+		temp3.add(neutral);
+		temp3.add(warm);
+		temp3.add(veryWarm);
+
 		sec.add(labelSec);
 		sec.add(securityLevel1);
 		sec.add(securityLevel2);
@@ -365,6 +387,17 @@ public class InterfaceView extends JFrame implements ActionListener{
 		securityGroup.add(securityLevel5);
 		securityLevel5.setText("Very secure");
 		
+		tempGroup.add(veryCold);
+		veryCold.setText("Very cold");
+		tempGroup.add(cold);
+		cold.setText("Cold");
+		tempGroup.add(neutral);
+		neutral.setText("Neutral");
+		tempGroup.add(warm);
+		warm.setText("Warm");
+		tempGroup.add(veryWarm);
+		veryWarm.setText("Very warm");
+		
 		
 		reconnect.addActionListener(new ActionListener()
 		{
@@ -376,12 +409,17 @@ public class InterfaceView extends JFrame implements ActionListener{
 		
 		temp.add(labelTemp);
 		temp.add(temperature);
-		
-		temperature.setMinorTickSpacing(1);
-		temperature.setMajorTickSpacing(10);
+		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+		labelTable.put(new Integer(220), new JLabel("22°C"));
+		labelTable.put(new Integer(380), new JLabel("38°C"));
+
+		temperature.setLabelTable(labelTable);
+		temperature.setPaintLabels(true);
+
 		temperature.setMinimum(220);
 		temperature.setMaximum(380);
 		temperature.setValue(300);
+		
 
 		peltierStatus = new JLabel(("              Connecting...  "));		
 		temp.add(peltierStatus);
@@ -399,6 +437,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 		southPanel.setLayout(new GridLayout(6,1));
 		southPanel.add(temp);
 		southPanel.add(temp2);
+		southPanel.add(temp3);
 		southPanel.add(sec);
 		southPanel.add(perso);
 		southPanel.add(validate);
@@ -496,7 +535,6 @@ public class InterfaceView extends JFrame implements ActionListener{
 			fw = new FileWriter(file.getAbsoluteFile(), true);
 			bw = new BufferedWriter(fw);
 			bw.write("\n" + currentScreen() + "," +temperature.getValue());
-			System.out.println(temperature.getValue());
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -688,6 +726,30 @@ public class InterfaceView extends JFrame implements ActionListener{
 	 */
 	private void whatIsSelected(String filename)
 	{
+		addToResults("corresponds", filename);
+		if (veryCold.isSelected())
+		{
+			addToResults("1", filename);
+		}
+		if (cold.isSelected())
+		{
+			addToResults("2", filename);
+		}
+		if (neutral.isSelected())
+		{
+			addToResults("3", filename);
+		}
+		if (warm.isSelected())
+		{
+			addToResults("4", filename);
+		}
+		if (veryWarm.isSelected())
+		{
+			addToResults("5", filename);
+		}
+		
+		addToResults("security level", filename);
+
 		
 		if (securityLevel1.isSelected())
 		{
@@ -709,6 +771,9 @@ public class InterfaceView extends JFrame implements ActionListener{
 		{
 			addToResults("5", filename);
 		}
+		
+		addToResults("personal info", filename);
+
 		if (persoNo.isSelected())
 		{
 			addToResults("0", filename);
@@ -717,6 +782,8 @@ public class InterfaceView extends JFrame implements ActionListener{
 		{
 			addToResults("1", filename);
 		}
+		addToResults("vib pattern", filename);
+
 		
 	//0 is pause, 1 is low short, 2 is low long, 3 is high short, 4 is low long
 		if (intensityLow1.isSelected() && shortVib1.isSelected())
@@ -901,6 +968,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 		intensityGroup2.clearSelection();
 		intensityGroup3.clearSelection();
 		intensityGroup4.clearSelection();
+		tempGroup.clearSelection();
 	}
 
 }
