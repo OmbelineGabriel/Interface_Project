@@ -198,7 +198,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 		listOfImages.add(screen10);
 		listOfImages.add(screen11);
 		listOfImages.add(screen12);
-		changeScreen();
+		chargeScreen();
 
 		JPanel WestPanel = new JPanel();
 		WestPanel.setLayout(new FlowLayout());
@@ -609,7 +609,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == validateSettings) {
 			addToFile("results-"+ participantId + ".txt");
-			changeScreen();
+			chargeScreen();
 		    whatIsSelected("results-"+ participantId + ".txt");
 		    lineBreak("results-"+ participantId + ".txt");
 		    resetButtons();
@@ -704,7 +704,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 	 * to pick an image in the image list
 	 * then deletes that image from the list so it's not picked again
 	 */
-	private void changeScreen()
+	private void chargeScreen()
 	{
 		int randindex = randomIndex();
 		if (randindex !=0)
