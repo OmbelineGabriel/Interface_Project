@@ -140,15 +140,11 @@ public class InterfaceView extends JFrame implements ActionListener{
 	JRadioButton warm = new JRadioButton();
 	JRadioButton veryWarm = new JRadioButton();
 	ButtonGroup tempGroup = new ButtonGroup();
-
 	
 	private JSlider temperature = new JSlider();
 
 	String participantId = JOptionPane.showInputDialog(this, "Participant ID:");
 		
-	//private Interface interf;
-
-	
 	/**
 	 * Defines the basic of the interface
 	 * @param interf
@@ -410,8 +406,8 @@ public class InterfaceView extends JFrame implements ActionListener{
 		temp.add(labelTemp);
 		temp.add(temperature);
 		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
-		labelTable.put(new Integer(220), new JLabel("22°C"));
-		labelTable.put(new Integer(380), new JLabel("38°C"));
+		labelTable.put(new Integer(220), new JLabel("22ï¿½C"));
+		labelTable.put(new Integer(380), new JLabel("38ï¿½C"));
 
 		temperature.setLabelTable(labelTable);
 		temperature.setPaintLabels(true);
@@ -445,13 +441,14 @@ public class InterfaceView extends JFrame implements ActionListener{
 		this.add(southPanel, BorderLayout.SOUTH);
 	}
 
-	
+	/**
+	 * Create the thread used to control the Peltier-based device
+	 */
 	final Runnable tempControl = new Runnable()
 	{
 		public void run() {
 			System.out.println("Setting the temperature to: "+Integer.toString(temperature.getValue()));
-			PeltierControl.setPeltierTemperature((temperature.getValue()));
-				
+			PeltierControl.setPeltierTemperature((temperature.getValue()));	
 			for (int i = 10; i > 0; i--){
 				System.out.println("changing the temperature");
 				tempStatus.setText(" Setting temperature...");
@@ -464,12 +461,14 @@ public class InterfaceView extends JFrame implements ActionListener{
 			}
 			System.out.println("Finished setting the temperature to "+temperature.getValue());
 			tempStatus.setText("Temperature Set");
-
 		}
 			
 	};
 	
-	
+	/**
+	 * Initialise listeners on the slider so that the temperature
+	 * changes when the user selects a new temperature
+	 */
 	private void initListeners()
 	{
 		temperature.addMouseListener(new MouseListener(){
@@ -500,7 +499,6 @@ public class InterfaceView extends JFrame implements ActionListener{
 	}
 
 		
-
 	/**
 	 * Plays the audiofile and adds forces a pause so that the files are playing one after the other 
 	 * and not all at the same time
@@ -578,6 +576,10 @@ public class InterfaceView extends JFrame implements ActionListener{
 	}
 	
 
+	/**
+	 * Adds a linebreak in the file 
+	 * @param filename
+	 */
 	private void lineBreak(String filename)
 	{
 		BufferedWriter bw = null;
@@ -617,7 +619,7 @@ public class InterfaceView extends JFrame implements ActionListener{
 		    persoYN.clearSelection();
 			temperature.setValue(300);
 			PeltierControl.setPeltierTemperature(300);
-			System.out.println("Resetting temperature to 30°C");
+			System.out.println("Resetting temperature to 30ï¿½C");
 			questNum++;
 			setTitle("Question "+questNum+"/12");
 			if (questNum == 13)
@@ -784,7 +786,6 @@ public class InterfaceView extends JFrame implements ActionListener{
 		}
 		addToResults("vib pattern", filename);
 
-		
 	//0 is pause, 1 is low short, 2 is low long, 3 is high short, 4 is low long
 		if (intensityLow1.isSelected() && shortVib1.isSelected())
 		{

@@ -1,2 +1,0 @@
-
-3,300,corresponds,3,security level,personal info,vib pattern
