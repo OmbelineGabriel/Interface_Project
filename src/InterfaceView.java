@@ -406,8 +406,8 @@ public class InterfaceView extends JFrame implements ActionListener{
 		temp.add(labelTemp);
 		temp.add(temperature);
 		Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
-		labelTable.put(new Integer(220), new JLabel("22ï¿½C"));
-		labelTable.put(new Integer(380), new JLabel("38ï¿½C"));
+		labelTable.put(new Integer(220), new JLabel("22°C"));
+		labelTable.put(new Integer(380), new JLabel("38°C"));
 
 		temperature.setLabelTable(labelTable);
 		temperature.setPaintLabels(true);
