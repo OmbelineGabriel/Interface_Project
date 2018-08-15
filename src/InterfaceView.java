@@ -968,7 +968,5 @@ public class InterfaceView extends JFrame implements ActionListener{
 		intensityGroup2.clearSelection();
 		intensityGroup3.clearSelection();
 		intensityGroup4.clearSelection();
-		tempGroup.clearSelection();
 	}
-
 }

@@ -1,0 +1,24 @@
+
+7,343,corresponds,security level,2,personal info,0,vib pattern,1,1
+
+1,271,corresponds,2,security level,5,personal info,1,vib pattern
+
+5,358,corresponds,security level,1,personal info,0,vib pattern,3,3
+
+11,318,corresponds,4,security level,2,personal info,0,vib pattern,1,0,1
+
+2,270,corresponds,2,security level,5,personal info,1,vib pattern
+
+4,380,corresponds,5,security level,1,personal info,0,vib pattern,3,3,3
+
+8,331,corresponds,security level,2,personal info,0,vib pattern,1,0,1
+
+6,368,corresponds,security level,1,personal info,0,vib pattern,1,4
+
+9,323,corresponds,security level,2,personal info,0,vib pattern,1,0,1
+
+12,306,corresponds,4,security level,2,personal info,0,vib pattern,1,0,1
+
+3,271,corresponds,2,security level,5,personal info,1,vib pattern
+
+10,340,corresponds,4,security level,2,personal info,0,vib pattern,3,3

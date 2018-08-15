@@ -1,0 +1,12 @@
+
+4,300,corresponds,security level,personal info,vib pattern
+
+7,300,corresponds,security level,personal info,vib pattern
+
+3,300,corresponds,security level,personal info,vib pattern
+
+10,300,corresponds,security level,personal info,vib pattern
+
+8,300,corresponds,security level,personal info,vib pattern
+
+12,300,corresponds,security level,personal info,vib pattern
